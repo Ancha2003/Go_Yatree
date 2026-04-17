@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx backend/server.ts",
-    "build": "tsc && vite build",
+    "build": "tsc -p tsconfig.backend.json && vite build",
     "start": "node dist/backend/server.js",
     "preview": "vite preview",
     "clean": "rm -rf dist",
