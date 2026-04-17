@@ -31,9 +31,7 @@ GoRide is a full-stack, real-time ride-hailing application specifically designed
 - System configuration for base fares and rates.
 - One-click seeding of demo drivers for testing environments.
 
-> Admin login:
-> - Email: `Admin@gmail.com`
-> - Password: `Admin123`
+
 
 ## Recent Updates
 - Fixed location update fetch errors by ensuring auth token presence.
