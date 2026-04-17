@@ -1,0 +1,108 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: userId (Auth UID)
+    // Fields:
+    //   - uid: string (required)
+    //   - email: string (required, email format)
+    //   - displayName: string (optional)
+    //   - role: string (required, ['user', 'driver', 'admin'])
+    //   - photoURL: string (optional)
+    //   - createdAt: timestamp (required)
+    //
+    // Collection: rides
+    // Document ID: auto-generated
+    // Fields:
+    //   - userId: string (required)
+    //   - driverId: string (optional)
+    //   - pickup: map (required, {address, lat, lng})
+    //   - dropoff: map (required, {address, lat, lng})
+    //   - status: string (required, ['pending', 'accepted', 'ongoing', 'completed', 'cancelled'])
+    //   - otp: string (optional)
+    //   - fare: number (optional)
+    //   - paymentMethod: string (required, 'cash')
+    //   - createdAt: timestamp (required)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+         (request.auth.token.email == "2207340130010@recbanda.ac.in" && request.auth.token.email_verified == true));
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    // ===============================================================
+    // Validators
+    // ===============================================================
+
+    function isValidUser(data) {
+      return data.uid == request.auth.uid &&
+             data.email is string && isValidEmail(data.email) &&
+             data.role in ['user', 'driver', 'admin'] &&
+             (data.role != 'admin' || isAdmin()); // Only admins can create admins
+    }
+
+    function isValidRide(data) {
+      return data.userId is string &&
+             data.status in ['pending', 'accepted', 'ongoing', 'completed', 'cancelled'] &&
+             data.paymentMethod == 'cash' &&
+             data.pickup is map && data.dropoff is map;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if (isOwner(userId) || isAdmin()) && 
+                      (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['balance', 'photoURL', 'displayName', 'phoneNumber', 'isOnline', 'currentLocation', 'lastSeen']) || 
+                       isValidUser(request.resource.data));
+    }
+
+    match /drivers_online/{driverId} {
+      allow read: if true; // Anyone can see online drivers
+      allow write: if isOwner(driverId);
+    }
+
+    match /rides/{rideId} {
+      allow read: if isAuthenticated() && (request.auth.uid == resource.data.userId || request.auth.uid == resource.data.driverId || isAdmin());
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update: if isAuthenticated() && (
+        (request.auth.uid == resource.data.userId) ||
+        (request.auth.uid == resource.data.driverId) ||
+        isAdmin()
+      );
+    }
+    
+    match /test/connection {
+      allow read: if true;
+    }
+  }
+}

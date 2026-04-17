@@ -1,0 +1,59 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "role": { "type": "string", "enum": ["user", "driver", "admin"] },
+        "photoURL": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "Ride": {
+      "title": "Ride",
+      "description": "Ride booking information",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "driverId": { "type": "string" },
+        "pickup": {
+          "type": "object",
+          "properties": {
+            "address": { "type": "string" },
+            "lat": { "type": "number" },
+            "lng": { "type": "number" }
+          }
+        },
+        "dropoff": {
+          "type": "object",
+          "properties": {
+            "address": { "type": "string" },
+            "lat": { "type": "number" },
+            "lng": { "type": "number" }
+          }
+        },
+        "status": { "type": "string", "enum": ["pending", "accepted", "ongoing", "completed", "cancelled"] },
+        "otp": { "type": "string" },
+        "fare": { "type": "number" },
+        "paymentMethod": { "type": "string", "enum": ["cash"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "pickup", "dropoff", "status", "paymentMethod"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "/rides/{rideId}": {
+      "schema": "Ride",
+      "description": "Ride bookings"
+    }
+  }
+}

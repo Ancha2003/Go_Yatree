@@ -1,0 +1,5 @@
+{
+  "name": "Texi-Booking-App",
+  "description": "A full-stack taxi booking application with real-time tracking, OTP verification, and cash payments.",
+  "requestFramePermissions": ["geolocation"]
+}
