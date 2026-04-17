@@ -2,7 +2,6 @@
   "name": "react-example",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
   "scripts": {
     "dev": "tsx backend/server.ts",
     "build": "tsc -p tsconfig.backend.json && vite build",

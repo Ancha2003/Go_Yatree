@@ -1,14 +1,13 @@
 {
-  "extends": null,
   "compilerOptions": {
     "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "rootDir": "./backend",
-    "outDir": "./dist/backend",
+    "module": "CommonJS",
+    "rootDir": "backend",
+    "outDir": "dist/backend",
     "esModuleInterop": true,
     "strict": false,
     "skipLibCheck": true,
+    "moduleResolution": "node",
     "resolveJsonModule": true
   },
   "include": ["backend/**/*.ts"]
