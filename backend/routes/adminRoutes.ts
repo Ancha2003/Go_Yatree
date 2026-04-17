@@ -162,7 +162,7 @@ router.get('/stats', verifyAdmin, async (req, res) => {
     const totalDrivers = await User.countDocuments({ role: 'driver' });
     const rides = await Ride.find({ status: 'completed' });
     
-    const totalRevenue = rides.reduce((acc, ride) => acc + ride.fare, 0);
+    const totalRevenue = rides.reduce((acc, ride) => acc + (ride.fare ?? 0), 0);
     // Assuming 20% commission is profit
     const totalProfit = totalRevenue * 0.2;
     
