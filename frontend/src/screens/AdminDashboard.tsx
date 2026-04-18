@@ -341,7 +341,7 @@ export const AdminDashboard = () => {
                 animate={{ opacity: 1 }}
                 className="text-xl font-bold text-slate-900 tracking-tight whitespace-nowrap"
               >
-                GORIDE Admin
+                 Go Yatree Admin
               </motion.h1>
             )}
           </div>
